@@ -1,0 +1,15 @@
+
+:
+
+preload.js,0\9\095721974d57f4b26685b3d9d7416b68b9039a3f
+;
+renderer.js,9\9\99d75600ed1949c5af762de39687c97e9fe4adb9
+7
+main.js,c\4\c4a4248f7568c9e41265502c39b0daeb8b635431
+:
+
+index.html,f\6\f6013a00b362253c64368d6eebc50ea2131754e2
+N
+whisper-based-transcription.js,1\4\1448a782e96338e8cfff82ea9910ce7d3e8f550c
+A
+whisper.worker.js,9\7\977eeba1058fdde16509683710eba52d4736b650

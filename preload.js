@@ -1,0 +1,53 @@
+/**
+ * The preload script runs before. It has access to web APIs
+ * as well as Electron's renderer process modules and some
+ * polyfilled Node.js functions.
+ *
+ * https://www.electronjs.org/docs/latest/tutorial/sandbox
+ */
+import { ipcRenderer, contextBridge } from "electron";
+console.log("0");
+
+contextBridge.exposeInMainWorld('media', {
+  getRecorder: () => mediaRecorder
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  console.log("1")
+  const replaceText = (selector, text) => {
+    const element = document.getElementById(selector)
+    if (element) {
+      element.innerText = text
+    }
+  }
+
+  for (const type of ['chrome', 'node', 'electron']) {
+    replaceText(`${ type }-version`, process.versions[type])
+  }
+  console.log("2")
+  ipcRenderer.on('SET_SOURCE', async (event, sourceId) => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: false,
+      })
+      console.log("3")
+      handleStream(stream)
+    } catch (e) {
+      handleError(e)
+    }
+  })
+})
+
+let mediaRecorder;
+
+export function handleStream(stream) {
+  console.log("yo")
+  console.log(stream);
+  mediaRecorder = new MediaRecorder(stream);
+  mediaRecorder.start();
+}
+
+function handleError(e) {
+  console.log(e)
+}

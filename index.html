@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+  <link href="./styles.css" rel="stylesheet">
+  <title>Hello World!</title>
+</head>
+<body style="overflow-x: hidden; overflow-y: hidden">
+<div class="popup-container">
+  <div class="popup" id="popup1">
+    it look
+  </div>
+</div>
+
+<img src="./Clippyicon.png" id="clippy"
+     style="">
+
+<!-- You can also require other files to run in this process -->
+
+<script src="./renderer.js"></script>
+</body>
+<style>
+  .popup-container {
+    -webkit-app-region: no-drag;
+    height: 100px;
+    display: flex;
+    align-items: flex-end;
+  }
+  #clippy {
+    -webkit-app-region: drag;
+    width: 250px;
+    height: 400px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+
+  .popup {
+    left: 20vmin;
+    width: 200px;
+    position: relative;
+    padding: 2vmin;
+    background: #ffc;
+    border-radius: 1vmin;
+    border: 0.375vmin solid #666;
+    font-size: 20px;
+    font-family: Tahoma, "Comic Sans MS", Courier, sans-serif;
+    line-height: 1.25;
+  }
+
+  .popup::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 100%;
+    right: 10%;
+    width: 6vmin;
+    height: 6vmin;
+    border-left: 0.375vmin solid #666;
+    background-image: linear-gradient(-45deg, transparent 50%, #666 0 54%, #ffc 0);
+    transform: skew(55deg);
+  }
+</style>
+</html>
