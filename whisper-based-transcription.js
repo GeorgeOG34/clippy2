@@ -101,7 +101,9 @@ function createWorker() {
       LOADING_MESSAGE_CONTAINER.innerHTML = "Downloading model...";
     }
     if (type === MessageTypes.RESULT) {
-      handleResultMessage(event.data);
+      // handleResultMessage(event.data);
+      const text = event.data.results.map(result => result.text).join(" ");
+      document.getElementById("popup1").innerHTML = text;
     }
     if (type === MessageTypes.RESULT_PARTIAL) {
       handlePartialResultMessage(event.data);
