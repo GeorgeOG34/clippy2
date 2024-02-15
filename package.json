@@ -17,7 +17,7 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "20.3.8"
+    "electron": "28.2.3"
   },
   "dependencies": {
     "win32-api": "^20.4.1"
