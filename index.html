@@ -4,28 +4,31 @@
   <meta charset="UTF-8">
   <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+        content="default-src 'self' 'unsafe-inline' http://localhost:11434; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://esm.run; style-src 'self' 'unsafe-inline'">
   <link href="./styles.css" rel="stylesheet">
   <title>Hello World!</title>
 </head>
 <body style="overflow-x: hidden; overflow-y: hidden">
-<div class="popup-container">
-  <div class="popup" id="popup1">
-    it look
+  <div class="popup-container">
+    <div class="popup" id="popup1">
+      Hi! I'm Clippy! I'm here to help!
+    </div>
   </div>
-</div>
 
 <img src="./Clippyicon.png" id="clippy"
      style="">
 
 <!-- You can also require other files to run in this process -->
 
-<script src="./renderer.js"></script>
+<script type="module" src="./renderer.js"></script>
 </body>
 <style>
+
   .popup-container {
     -webkit-app-region: no-drag;
     height: 100px;
+    bottom: 390px;
+    position: absolute;
     display: flex;
     align-items: flex-end;
   }

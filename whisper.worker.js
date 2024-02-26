@@ -1,5 +1,37 @@
-import { createModelLoader } from "./modelFactories.js";
-import { MessageTypes, ModelNames } from "./utils.js";
+import {pipeline} from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.15.0';
+
+
+function createModelLoader(model_name) {
+  let model = null;
+  const load_model = async ({progress_callback = undefined}) => {
+    if (model === null) {
+      model = await pipeline("automatic-speech-recognition", model_name, {
+        progress_callback,
+      });
+    }
+    return model;
+  };
+  return load_model;
+}
+
+
+const ModelNames = {
+  WHISPER_TINY_EN: "openai/whisper-tiny.en",
+  WHISPER_TINY: "openai/whisper-tiny",
+  WHISPER_BASE: "Xenova/whisper-tiny.en",
+  WHISPER_BASE_EN: "openai/whisper-base.en",
+  WHISPER_SMALL: "openai/whisper-small",
+  WHISPER_SMALL_EN: "openai/whisper-small.en",
+};
+
+const MessageTypes = {
+  DOWNLOADING: "DOWNLOADING",
+  LOADING: "LOADING",
+  RESULT: "RESULT",
+  RESULT_PARTIAL: "RESULT_PARTIAL",
+  INFERENCE_REQUEST: "INFERENCE_REQUEST",
+  INFERENCE_DONE: "INFERENCE_DONE",
+};
 
 const modelLoaders = {};
 for (const model_name of Object.values(ModelNames)) {
@@ -7,7 +39,7 @@ for (const model_name of Object.values(ModelNames)) {
 }
 
 self.addEventListener("message", async (event) => {
-  const { type, audio, model_name } = event.data;
+  const {type, audio, model_name} = event.data;
   if (type === MessageTypes.INFERENCE_REQUEST) {
     await transcribe(audio, model_name);
   }
@@ -44,9 +76,9 @@ async function transcribe(audio, model_name) {
 }
 
 async function load_model_callback(data) {
-  const { status } = data;
+  const {status} = data;
   if (status === "progress") {
-    const { file, progress, loaded, total } = data;
+    const {file, progress, loaded, total} = data;
     sendDownloadingMessage(file, progress, loaded, total);
   }
   if (status === "done") {
@@ -88,7 +120,7 @@ class GenerationTracker {
   }
 
   sendFinalResult() {
-    self.postMessage({ type: MessageTypes.INFERENCE_DONE });
+    self.postMessage({type: MessageTypes.INFERENCE_DONE});
   }
 
   callbackFunction(beams) {
@@ -112,7 +144,7 @@ class GenerationTracker {
 
   chunkCallback(data) {
     this.chunks.push(data);
-    const [text, { chunks }] = this.pipeline.tokenizer._decode_asr(
+    const [text, {chunks}] = this.pipeline.tokenizer._decode_asr(
       this.chunks,
       {
         time_precision: this.time_precision,
@@ -140,7 +172,7 @@ class GenerationTracker {
   }
 
   processChunk(chunk, index) {
-    const { text, timestamp } = chunk;
+    const {text, timestamp} = chunk;
     const [start, end] = timestamp;
 
     return {

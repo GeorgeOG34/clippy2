@@ -15,7 +15,7 @@ async function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 500,
-    height: 400,
+    height: screen.getPrimaryDisplay().bounds.height,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     },

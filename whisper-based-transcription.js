@@ -1,3 +1,5 @@
+
+
 const MessageTypes = {
   DOWNLOADING: "DOWNLOADING",
   LOADING: "LOADING",
@@ -61,38 +63,13 @@ const LOADING_MESSAGE_CONTAINER = document.getElementById(
 /** Web worker **/
 let WORKER;
 
-$(document).ready(() => {
-  FORM_SUBMIT_BTN.disabled = true;
-  /** Form view elements **/
-  FORM_SUBMIT_BTN.addEventListener("click", async (event) => {
-    event.preventDefault();
-    await handleFormSubmission();
-  });
-
-  FILE_UPLOAD_BTN.addEventListener("change", (event) => onFormInputChanges());
-  MODEL_NAME_SELECTION_INPUT.addEventListener("change", (event) =>
-    onFormInputChanges()
-  );
-
-  /** transcription view elements **/
-  VIDEO_PLAYER.addEventListener("timeupdate", (event) =>
-    highlightCurrentChunk(event.target.currentTime)
-  );
-  CLOSE_TRANSCRIPT_BTN.addEventListener("click", (event) => {
-    event.preventDefault();
-    showFormView();
-  });
-  DOWNLOAD_TRANSCRIPT_BTN.disabled = true;
-  DOWNLOAD_TRANSCRIPT_BTN.addEventListener("click", (event) => {
-    event.preventDefault();
-    downloadTranscript();
-  });
+document.addEventListener("DOMContentLoaded", function() {
   WORKER = createWorker();
 });
 
 function createWorker() {
-  const worker = new Worker(whisperWorkerPath);
-  worker.onmessage = (event) => {
+  const worker = new Worker("./whisper.worker.js", { type: "module" });
+  worker.onmessage = async (event) => {
     const {type} = event.data;
     if (type === MessageTypes.LOADING) {
       handleLoadingMessage(event.data);
@@ -101,9 +78,27 @@ function createWorker() {
       LOADING_MESSAGE_CONTAINER.innerHTML = "Downloading model...";
     }
     if (type === MessageTypes.RESULT) {
-      // handleResultMessage(event.data);
       const text = event.data.results.map(result => result.text).join(" ");
-      document.getElementById("popup1").innerHTML = text;
+      try {
+        const prompt = `You are a sassy microsoft clippy. In 20 words or less respond to the following trying to be mildly helpful: """${text}"""`
+
+        const response = await (await fetch("http://localhost:11434/api/chat", {method: "POST", body: JSON.stringify({
+            model: 'gemma:7b',
+            messages: [{ role: 'user', content: prompt }],
+            stream: false,
+          })})).json();
+
+        console.log(response)
+        console.log(response.message.content)
+        document.getElementsByClassName("popup")[0].innerHTML = response.message.content;
+      } catch (e) {
+        console.error(e);
+      }
+
+      try {
+        console.log(text);
+      } catch (e) {
+        console.error(e);}
     }
     if (type === MessageTypes.RESULT_PARTIAL) {
       handlePartialResultMessage(event.data);
@@ -168,6 +163,7 @@ function handlePartialResultMessage(data) {
   PARTIAL_RESULTS_CONTAINER.innerHTML = "";
   PARTIAL_RESULTS_CONTAINER.appendChild(resultElement);
 }
+
 
 function handleResultMessage(data) {
   const {results, completedUntilTimestamp} = data;
@@ -234,13 +230,7 @@ function createResultLine(result, isDone) {
 }
 
 export async function handleFormSubmission(blob) {
-  if (!isFileUploaded() || !isModelNameSelected()) {
-    return;
-  }
-
-  const model_name = `openai/whisper-base`;
-  // const file = FILE_UPLOAD_BTN.files[0];
-   const file = FILE_UPLOAD_BTN.files[0];
+  const model_name = `Xenova/whisper-tiny.en`;
   const audio = await readAudioFrom(blob);
 
   WORKER.postMessage({
@@ -252,6 +242,7 @@ export async function handleFormSubmission(blob) {
 
 async function readAudioFrom(blob) {
   const response = await blob.arrayBuffer();
+  const audioCTX = new AudioContext({ sampleRate: 16000 });
   const decoded = await audioCTX.decodeAudioData(response);
   const audio = decoded.getChannelData(0);
   return audio;

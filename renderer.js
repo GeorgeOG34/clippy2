@@ -11,7 +11,7 @@ document.getElementById("popup1").innerHTML = "2";
 
 // const { writeFile } = require('fs');
 
-const { handleFormSubmission } = require("whisper-based-transcription");
+import { handleFormSubmission } from "./whisper-based-transcription.js";
 
 
 
@@ -42,30 +42,33 @@ async function selectSource() {
 let mediaRecorder; // MediaRecorder instance to capture footage
 const recordedChunks = [];
 
-// Buttons
-const videoElement = document.querySelector('video');
+
 
 let recording = false;
 
-const startBtn = document.getElementsByClassName('popup-container')[0];
+const startBtn = document.getElementsByClassName('popup')[0];
 
+startRecording();
+window.setInterval(startRecording, 60000);
 
-startBtn.addEventListener("click",  async  e => {
+async function startRecording() {
   if(!recording){
     await selectSource();
     mediaRecorder.start();
-    document.getElementById("popup1").innerHTML = "clicked";
-    startBtn.classList.add('is-danger');
-    startBtn.innerText = 'Recording';
-  } else{
-    mediaRecorder.stop();
-    startBtn.classList.remove('is-danger');
-    startBtn.innerText = 'Ended';
+    // startBtn.innerText = 'Recording';
+    window.setTimeout(stopRecording, 10000);
   }
-  recording = !recording;
-});
+}
 
-document.getElementById("popup1").innerHTML = "4";
+async function stopRecording() {
+  mediaRecorder.stop();
+  // startBtn.innerText = 'Ended';
+  recording = false;
+}
+
+startBtn.addEventListener("click",  async  e => {
+
+});
 
 
 
@@ -87,6 +90,5 @@ async function handleStop(e) {
   });
 
   await handleFormSubmission(blob);
-  document.getElementById("popup1").innerHTML = buffer;
 
 }
