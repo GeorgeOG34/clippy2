@@ -67,6 +67,24 @@ document.addEventListener("DOMContentLoaded", function() {
   WORKER = createWorker();
 });
 
+async function getStackOverflowQuestions(question){
+  console.log(question);
+  const withoutQuotes = question.match(/([^"]*)"$/)[1].replace(/"/g, "");
+  console.log(withoutQuotes);
+  const response = await (await fetch(`https://api.stackexchange.com/2.3/similar?order=desc&sort=relevance&site=stackoverflow&title=${encodeURIComponent(withoutQuotes)}`)).json();
+  console.log(response);
+  const questionId = response.items.filter(item => item.is_answered)[0].question_id;
+  console.log(questionId);
+  const answers = await (await fetch(`https://api.stackexchange.com/2.3/questions/${questionId}/answers?order=desc&sort=activity&site=stackoverflow&filter=withbody`)).json();
+
+  console.log(answers);
+  if (answers.items.length > 0) {
+    console.log(answers.items[0].body)
+    return await answers.items[0].body;
+  }
+  return "no answer found"
+}
+
 function createWorker() {
   const worker = new Worker("./whisper.worker.js", { type: "module" });
   worker.onmessage = async (event) => {
@@ -80,17 +98,20 @@ function createWorker() {
     if (type === MessageTypes.RESULT) {
       const text = event.data.results.map(result => result.text).join(" ");
       try {
-        const prompt = `You are a sassy microsoft clippy. In 20 words or less respond to the following trying to be mildly helpful: """${text}"""`
+        // const prompt = `You are a sassy microsoft clippy. In 20 words or less respond to the following trying to be mildly helpful: """${text}"""`
 
+        const prompt = `Summarise the following problem as if it was a stack overflow question title. Respond with only the title. Use less than 10 words. """${text}"""`
         const response = await (await fetch("http://localhost:11434/api/chat", {method: "POST", body: JSON.stringify({
-            model: 'gemma:7b',
+            model: 'mistral:7b-instruct',
             messages: [{ role: 'user', content: prompt }],
             stream: false,
           })})).json();
 
         console.log(response)
         console.log(response.message.content)
-        document.getElementsByClassName("popup")[0].innerHTML = response.message.content;
+        const stackOverflowResponse = await getStackOverflowQuestions(response.message.content)
+        // document.getElementsByClassName("popup")[0].innerHTML = response.message.content;
+        document.getElementsByClassName("popup")[0].innerHTML = stackOverflowResponse;
       } catch (e) {
         console.error(e);
       }

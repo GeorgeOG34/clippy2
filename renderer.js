@@ -48,8 +48,27 @@ let recording = false;
 
 const startBtn = document.getElementsByClassName('popup')[0];
 
+
+// triggerDesktopCapture();
+window.setInterval(triggerDesktopCapture, 30000);
+async function triggerDesktopCapture() {
+
+
+  const image = await captureDesktop();
+  const response = await (await fetch("http://localhost:11434/api/generate", {method: "POST", body: JSON.stringify({
+      model: 'llava:7b',
+      prompt: "Give me one piece of coding advice based on the code in the following picture in 20 words or less, and in a rude undertone:" ,
+      images: [image],
+      stream: false,
+    })})).json();
+
+  console.log(response.response.replace("\" ", "").replace(" \"", ""))
+  document.getElementsByClassName("popup")[0].innerHTML = response.response.replace("\" ", "").replace(" \"", "");
+}
+
+// TODO put this back
 startRecording();
-window.setInterval(startRecording, 60000);
+window.setInterval(startRecording, 30000);
 
 async function startRecording() {
   if(!recording){
@@ -65,10 +84,6 @@ async function stopRecording() {
   // startBtn.innerText = 'Ended';
   recording = false;
 }
-
-startBtn.addEventListener("click",  async  e => {
-
-});
 
 
 
