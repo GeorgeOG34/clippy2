@@ -5,105 +5,30 @@
  * `contextIsolation` is turned on. Use the contextBridge API in `preload.js`
  * to expose Node.js functionality from the main process.
  */
-document.getElementById("popup1").innerHTML = "yo";
+import {getScreenshotAsBase64} from "./screen-reader.js";
+import {getImageChatResponse} from "./apis.js";
+import {startRecording} from "./voice-recording.js";
 
-document.getElementById("popup1").innerHTML = "2";
-
-// const { writeFile } = require('fs');
-
-import { handleFormSubmission } from "./whisper-based-transcription.js";
-
-
-
-async function selectSource() {
-  const constraints = {
-    audio: true,
-    video: false
-  }
-  // Create a Stream
-
-  const stream = await navigator.mediaDevices
-    .getUserMedia(constraints);
-  console.log(stream)
-  console.log(await navigator.mediaDevices)
-  // Preview the source in a video element
-  // Create the Media Recorder
-  mediaRecorder = new MediaRecorder(stream);
-  // Register Event Handlers
-  mediaRecorder.ondataavailable = handleDataAvailable;
-  mediaRecorder.onstop = handleStop;
-  // Updates the UI
-
+// START   POSITION
+async function onStartup() {
+  // startRecording();
+  screenshotAndRespond();
+  // window.setInterval(startRecording, 60000);
+  window.setInterval(screenshotAndRespond, 30000);
 }
 
- //TODO https://github.com/fireship-io/223-electron-screen-recorder/blob/master/src/render.js
-
-// Global state
-let mediaRecorder; // MediaRecorder instance to capture footage
-const recordedChunks = [];
+onStartup();
 
 
+async function screenshotAndRespond() {
+  const screenshotAsBase64 = await getScreenshotAsBase64();
 
-let recording = false;
+  const response = await getImageChatResponse(screenshotAsBase64);
 
-const startBtn = document.getElementsByClassName('popup')[0];
-
-
-// triggerDesktopCapture();
-window.setInterval(triggerDesktopCapture, 30000);
-async function triggerDesktopCapture() {
-
-
-  const image = await captureDesktop();
-  const response = await (await fetch("http://localhost:11434/api/generate", {method: "POST", body: JSON.stringify({
-      model: 'llava:7b',
-      prompt: "Give me one piece of coding advice based on the code in the following picture in 20 words or less, and in a rude undertone:" ,
-      images: [image],
-      stream: false,
-    })})).json();
-
-  console.log(response.response.replace("\" ", "").replace(" \"", ""))
-  document.getElementsByClassName("popup")[0].innerHTML = response.response.replace("\" ", "").replace(" \"", "");
+  showResponse(response.response.replace("\" ", "").replace(" \"", ""));
 }
 
-// TODO put this back
-startRecording();
-window.setInterval(startRecording, 30000);
-
-async function startRecording() {
-  if(!recording){
-    await selectSource();
-    mediaRecorder.start();
-    // startBtn.innerText = 'Recording';
-    window.setTimeout(stopRecording, 10000);
-  }
-}
-
-async function stopRecording() {
-  mediaRecorder.stop();
-  // startBtn.innerText = 'Ended';
-  recording = false;
-}
-
-
-
-
-// Get the available video sources
-
-// Change the videoSource window to record
-
-// Captures all recorded chunks
-function handleDataAvailable(e) {
-  console.log('video data available');
-  recordedChunks.push(e.data);
-}
-
-// Saves the video file on stop
-async function handleStop(e) {
-  const blob = new Blob(recordedChunks, {
-    type: "audio/ogg; codecs=opus"
-  });
-
-  await handleFormSubmission(blob);
-
+export function showResponse(response) {
+  console.log(response);
+  document.getElementsByClassName("popup")[0].innerHTML = response;
 }

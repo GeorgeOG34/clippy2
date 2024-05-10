@@ -1,13 +1,17 @@
 
+export async function getScreenshotAsBase64() {
+  const bitmap = await captureDesktopBitmap();
+  return convertToBase64(bitmap);
+}
 
-export async function captureDesktop() {
-  // const stream  = await navigator.mediaDevices.getDisplayMedia({video: { displaySurface: 'window' }})
+
+async function captureDesktopBitmap() {
   const stream  = await window.navigator.mediaDevices.getUserMedia({
     audio: false,
     video: {
        mandatory:{
-        chromeMediaSource: 'desktop',
-        chromeMediaSourceId: "screen:0:0"
+        mediaSource: 'desktop',
+        mediaSourceId: "screen:0:0"
       }
     }
 
@@ -21,30 +25,15 @@ export async function captureDesktop() {
   // destroy video track to prevent more recording / mem leak
   track.stop()
 
+
+  return bitmap;
+}
+
+function convertToBase64(bitmap) {
   const canvas = document.createElement('canvas')
-
-
-
-  // this could be a document.createElement('canvas') if you want
-  // draw weird image type to canvas so we can get a useful image
   canvas.width = bitmap.width
   canvas.height = bitmap.height
   const context = canvas.getContext('2d')
   context.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
-  const image = canvas.toDataURL("image/jpeg",).replace("data:image/jpeg;base64,", "")
-
-
- //
-  // this turns the base 64 string to a [File] object
-  // const res = await fetch(image)
-  // const buff = await res.arrayBuffer();
-  // clone so we can rename, and put into array for easy proccessing
-  // const file = [
-  //   new File([buff], `photo_${new Date()}.jpg`, {
-  //     type: 'image/jpeg',
-  //   }),
-  // ]
-
-
-  return image
+  return canvas.toDataURL("image/jpeg",).replace("data:image/jpeg;base64,", "")
 }

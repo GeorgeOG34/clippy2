@@ -1,4 +1,4 @@
-import {handleVoiceResponse} from "./voice-recording";
+import {handleVoiceResponse} from "./voice-recording.js";
 
 const MessageTypes = {
   DOWNLOADING: "DOWNLOADING",
@@ -33,7 +33,7 @@ export async function transcribeAudio(audioData) {
 
   WORKER.postMessage({
     type: MessageTypes.INFERENCE_REQUEST,
-    audioData,
+    audio: audioData,
     model_name,
   });
 }

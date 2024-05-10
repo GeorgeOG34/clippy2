@@ -12,8 +12,6 @@ const user32 = User32.load();
 let mainWindow;
 
 async function createWindow() {
-  console.log("test")
-  console.log(await desktopCapturer.getSources({ types:['desktop', 'screen'] }))
 
   // Create the browser window.
   mainWindow = new BrowserWindow({

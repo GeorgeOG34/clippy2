@@ -41,6 +41,7 @@ for (const model_name of Object.values(ModelNames)) {
 self.addEventListener("message", async (event) => {
   const {type, audio, model_name} = event.data;
   if (type === MessageTypes.INFERENCE_REQUEST) {
+    console.log(audio);
     await transcribe(audio, model_name);
   }
 });
@@ -62,6 +63,7 @@ async function transcribe(audio, model_name) {
 
   const stride_length_s = 5;
   const generationTracker = new GenerationTracker(pipeline, stride_length_s);
+  console.log(audio);
   await pipeline(audio, {
     top_k: 0, // TODO: make this configurable via request
     do_sample: false, // TODO: make this configurable via request

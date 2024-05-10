@@ -18,3 +18,28 @@ export async function getImageChatResponse(screenshotAsBase64){
     })})).json();
   return response;
 }
+
+
+export async function getStackOverflowAnswer(question){
+  console.log(question);
+  const withoutQuotes = question.match(/([^"]*)"$/)[1].replace(/"/g, "");
+  console.log(withoutQuotes);
+  const response = await (await fetch(`https://api.stackexchange.com/2.3/similar?order=desc&sort=relevance&site=stackoverflow&title=${encodeURIComponent(withoutQuotes)}`)).json();
+  console.log(response);
+  const questionId = response.items.filter(item => item.is_answered)[0].question_id;
+  console.log(questionId);
+  const answers = await (await fetch(`https://api.stackexchange.com/2.3/questions/${questionId}/answers?order=desc&sort=activity&site=stackoverflow&filter=withbody`)).json();
+
+  console.log(answers);
+  if (answers.items.length > 0) {
+    console.log(answers.items[0].body)
+    return convertMarkdownToHtml(await answers.items[0].body);
+  }
+  return "no answer found"
+}
+
+const converter = new window.showdown.Converter();
+
+function convertMarkdownToHtml(markdown){
+  return converter.makeHtml(markdown);
+}
