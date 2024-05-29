@@ -20,7 +20,6 @@ export async function getImageChatResponse(screenshotAsBase64){
   return response;
 }
 
-
 export async function getStackOverflowAnswer(question){
   console.log(question);
   const withoutQuotes = question.match(/([^"]*)"$/)[1].replace(/"/g, "");
