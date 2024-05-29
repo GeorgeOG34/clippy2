@@ -11,26 +11,7 @@
 <body style="overflow-x: hidden; overflow-y: hidden">
   <div class="popup-container">
     <div class="popup" id="popup1">
-      The safest way to pass credentials to curl is to be prompted to insert them. This is what happens when passing the username as suggested earlier (-u USERNAME).
-
-      But what if you can't pass the username that way? For instance the username might need to be part of the url and only the password be part of a json payload.
-
-      tl;dr: This is how to use curl safely in this case:
-
-      read -p "Username: " U; read -sp "Password: " P; curl --request POST -d "{\"password\":\"${P}\"}" https://example.com/login/${U}; unset P U
-      read will prompt for both username and password from the command line, and store the submitted values in two variables that can be references in subsequent commands and finally unset.
-
-      I'm gonna elaborate on why the other solutions are not ideal.
-
-      Why are environment variables unsafe
-
-      Access and exposure mode of the content of an environment variable, can not be tracked (ps -eww ) since the environment is implicitly available to a process
-      Often apps grab the whole environment and log it for debugging or monitoring purposes (sometimes on log files plaintext on disk, especially after an app crashes)
-      Environment variables are passed down to child processes (therefore breaking the principle of least privilege)
-      Maintaining them is an issue: new engineers don't know they are there, and are not aware of requirements around them - e.g., not to pass them to sub-processes - since they're not enforced or documented.
-      Why is it unsafe to type it into a command on the command line directly Because your secret then ends up being visible by any other user running ps -aux since that lists commands submitted for each currently running process. Also because your secrte then ends up in the bash history (once the shell terminates).
-
-      Why is it unsafe to include it in a local file Strict POSIX access restriction on the file can mitigate the risk in this scenario. However, it is still a file on your file system, unencrypted at rest.
+      Hi! I'm Clippy!
     </div>
   </div>
 
@@ -51,6 +32,8 @@
     position: absolute;
     display: flex;
     align-items: flex-end;
+    word-wrap: break-word;
+    white-space: pre-wrap;
   }
   code {
     word-wrap: break-word;
@@ -66,8 +49,10 @@
   }
 
   .popup {
+    width: fit-content;
     left: 20vmin;
-    width: 200px;
+    min-width: 200px;
+    max-width: 360px;
     position: relative;
     padding: 2vmin;
     background: #ffc;
@@ -83,7 +68,7 @@
     display: block;
     position: absolute;
     top: 100%;
-    right: 10%;
+    right: 70%;
     width: 6vmin;
     height: 6vmin;
     border-left: 0.375vmin solid #666;

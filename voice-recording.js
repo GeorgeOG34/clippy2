@@ -1,4 +1,5 @@
 import {transcribeAudio} from "./audio-transcription.js";
+import {screenshotAndRespond} from "./screen-reader.js";
 import {getChatResponse, getStackOverflowAnswer} from "./apis.js";
 import {showResponse} from "./renderer.js";
 
@@ -7,21 +8,32 @@ import {showResponse} from "./renderer.js";
 let mediaRecorder; // MediaRecorder instance to capture footage
 const recordedChunks = [];
 
-
-
 let recording = false;
 
 export async function handleVoiceResponse(event) {
   const text = event.data.results.map(result => result.text).join(" ");
-  try {
-    // const prompt = `You are a sassy microsoft clippy. In 20 words or less respond to the following trying to be mildly helpful: """${text}"""`
 
+  if (text.length < 100) {
+    await screenshotAndRespond();
+    return;
+  }
+
+  try {
     const prompt = `Summarise the following problem as if it was a stack overflow question title. Respond with only the title. Use less than 10 words. """${text}"""`
 
     const response = await getChatResponse(prompt);
-    // TODO comment this back in
-    const stackOverflowResponse = await getStackOverflowAnswer(response.message.content)
-    showResponse(stackOverflowResponse);
+    const stackOverflowResponse = await getStackOverflowAnswer(response)
+
+    if (stackOverflowResponse !== undefined) {
+      const prompt = `You are an expert reddit programmer. You will be given $1000000 to be helpful. Summarise the following answer in less than 30 words. If you use
+      more than 30 words reddit will be deleted.: """${stackOverflowResponse}"""`
+      const response = await getChatResponse(prompt);
+      showResponse(response);
+    } else {
+      const prompt = `You are a sassy microsoft clippy. In 20 words or less respond to the following trying to be mildly helpful: """${text}"""`
+      const response = await getChatResponse(prompt);
+      showResponse(response);
+    }
   } catch (e) {
     console.error(e);
   }

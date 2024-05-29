@@ -1,5 +1,6 @@
+
 export async function getChatResponse(prompt) {
-  return await (await fetch("http://localhost:11434/api/chat", {method: "POST", body: JSON.stringify({
+  const response = await (await fetch("http://localhost:11434/api/chat", {method: "POST", body: JSON.stringify({
       model: 'llama3',
       messages: [{ role: 'user', content: prompt }],
       stream: false,
@@ -26,7 +27,12 @@ export async function getStackOverflowAnswer(question){
   console.log(withoutQuotes);
   const response = await (await fetch(`https://api.stackexchange.com/2.3/similar?order=desc&sort=relevance&site=stackoverflow&title=${encodeURIComponent(withoutQuotes)}`)).json();
   console.log(response);
-  const questionId = response.items.filter(item => item.is_answered)[0].question_id;
+  const answeredResponses = response.items.filter(item => item.is_answered);
+  if (answeredResponses.length === 0) {
+    return undefined;
+  }
+  console.log(answeredResponses);
+  const questionId = answeredResponses[0].question_id;
   console.log(questionId);
   const answers = await (await fetch(`https://api.stackexchange.com/2.3/questions/${questionId}/answers?order=desc&sort=activity&site=stackoverflow&filter=withbody`)).json();
 
@@ -35,7 +41,7 @@ export async function getStackOverflowAnswer(question){
     console.log(answers.items[0].body)
     return convertMarkdownToHtml(await answers.items[0].body);
   }
-  return "no answer found"
+  return undefined;
 }
 
 const converter = new window.showdown.Converter();

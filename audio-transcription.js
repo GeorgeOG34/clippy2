@@ -29,7 +29,7 @@ function createWorker() {
 }
 
 export async function transcribeAudio(audioData) {
-  const model_name = `Xenova/whisper-tiny.en`;
+  const model_name = `Xenova/whisper-base.en`;
 
   WORKER.postMessage({
     type: MessageTypes.INFERENCE_REQUEST,

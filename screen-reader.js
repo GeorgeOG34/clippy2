@@ -1,5 +1,15 @@
+import {getImageChatResponse} from "./apis.js";
+import {showResponse} from "./renderer.js";
 
-export async function getScreenshotAsBase64() {
+export async function screenshotAndRespond() {
+  const screenshotAsBase64 = await getScreenshotAsBase64();
+
+  const response = await getImageChatResponse(screenshotAsBase64);
+
+  showResponse(response.response.replace("\" ", "").replace(" \"", ""));
+}
+
+async function getScreenshotAsBase64() {
   const bitmap = await captureDesktopBitmap();
   return convertToBase64(bitmap);
 }
