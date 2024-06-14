@@ -2,16 +2,26 @@ import {transcribeAudio} from "./audio-transcription.js";
 import {screenshotAndRespond} from "./screen-reader.js";
 import {getChatResponse, getStackOverflowAnswer} from "./apis.js";
 import {showResponse} from "./renderer.js";
+import {openLastUrl, closeLastUrl} from "./browserwindow.js";
+import {clippyProcessing, clippyRecording} from "./clippy-changer.js";
 
 
 // Global state
 let mediaRecorder; // MediaRecorder instance to capture footage
-const recordedChunks = [];
+let recordedChunks = [];
 
 let recording = false;
 
 export async function handleVoiceResponse(event) {
   const text = event.data.results.map(result => result.text).join(" ");
+
+  console.log("Text: " + text);
+
+  if (text.toLowerCase().includes("close")) {
+    closeLastUrl();
+  }else if (text.toLowerCase().includes("open")) {
+    openLastUrl();
+  }
 
   if (text.length < 100) {
     await screenshotAndRespond();
@@ -67,7 +77,10 @@ async function selectSource() {
 }
 
 export async function startRecording() {
+  console.log("Starting to record");
+  clippyRecording();
   if(!recording){
+    recordedChunks = [];
     await selectSource();
     mediaRecorder.start();
     // startBtn.innerText = 'Recording';
@@ -77,6 +90,7 @@ export async function startRecording() {
 
 async function stopRecording() {
   mediaRecorder.stop();
+  clippyProcessing();
   // startBtn.innerText = 'Ended';
   recording = false;
 }

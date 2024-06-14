@@ -1,4 +1,5 @@
 import {handleVoiceResponse} from "./voice-recording.js";
+import {debounce} from "./utils.js";
 
 const MessageTypes = {
   DOWNLOADING: "DOWNLOADING",
@@ -20,8 +21,8 @@ function createWorker() {
   const worker = new Worker("./whisper.worker.js", { type: "module" });
   worker.onmessage = async (event) => {
     const {type} = event.data;
-    if (type === MessageTypes.RESULT) {
-      await handleVoiceResponse(event)
+    if (type === MessageTypes.INFERENCE_DONE) {
+      await handleVoiceResponse(event);
     }
 
   };

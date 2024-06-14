@@ -6,13 +6,18 @@
  * to expose Node.js functionality from the main process.
  */
 import {startRecording} from "./voice-recording.js";
+import {debounce} from "./utils.js";
 
 // START   POSITION
 startRecording();
 
 
+let running = false;
+let expected = 0;
 export function showResponse(response) {
   console.log(response);
   document.getElementsByClassName("popup")[0].innerHTML = response;
-  setTimeout(startRecording, 30000);
+
+  debounce(startRecording)();
 }
+

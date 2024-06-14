@@ -122,7 +122,7 @@ class GenerationTracker {
   }
 
   sendFinalResult() {
-    self.postMessage({type: MessageTypes.INFERENCE_DONE});
+    self.postMessage({type: MessageTypes.INFERENCE_DONE, results: this.processed_chunks});
   }
 
   callbackFunction(beams) {

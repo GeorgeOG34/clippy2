@@ -1,7 +1,9 @@
 import {getImageChatResponse} from "./apis.js";
 import {showResponse} from "./renderer.js";
+import {clippyProcessing, clippyReading} from "./clippy-changer.js";
 
 export async function screenshotAndRespond() {
+  clippyReading()
   const screenshotAsBase64 = await getScreenshotAsBase64();
 
   const response = await getImageChatResponse(screenshotAsBase64);
@@ -40,6 +42,7 @@ async function captureDesktopBitmap() {
 }
 
 function convertToBase64(bitmap) {
+  clippyProcessing();
   const canvas = document.createElement('canvas')
   canvas.width = bitmap.width
   canvas.height = bitmap.height

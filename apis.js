@@ -1,3 +1,4 @@
+import {setLastUrl} from "./browserwindow.js";
 
 export async function getChatResponse(prompt) {
   const response = await (await fetch("http://localhost:11434/api/chat", {method: "POST", body: JSON.stringify({
@@ -33,6 +34,7 @@ export async function getStackOverflowAnswer(question){
   console.log(answeredResponses);
   const questionId = answeredResponses[0].question_id;
   console.log(questionId);
+  setLastUrl(answeredResponses[0].link);
   const answers = await (await fetch(`https://api.stackexchange.com/2.3/questions/${questionId}/answers?order=desc&sort=activity&site=stackoverflow&filter=withbody`)).json();
 
   console.log(answers);

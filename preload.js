@@ -6,7 +6,6 @@
  * https://www.electronjs.org/docs/latest/tutorial/sandbox
  */
 import { ipcRenderer, contextBridge } from "electron";
-console.log("0");
 
 contextBridge.exposeInMainWorld('media', {
   getRecorder: () => mediaRecorder
@@ -31,7 +30,6 @@ window.addEventListener('DOMContentLoaded', () => {
         audio: true,
         video: false,
       })
-      console.log("3")
       handleStream(stream)
     } catch (e) {
       handleError(e)
