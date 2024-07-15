@@ -18,7 +18,9 @@ async function createWindow() {
     width: 500,
     height: screen.getPrimaryDisplay().bounds.height,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: false,
+      nodeIntegration: true
     },
     transparent: true,
     frame: false,

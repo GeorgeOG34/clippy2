@@ -4,6 +4,7 @@ import {getChatResponse, getStackOverflowAnswer} from "./apis.js";
 import {showResponse} from "./renderer.js";
 import {openLastUrl, closeLastUrl} from "./browserwindow.js";
 import {clippyProcessing, clippyRecording} from "./clippy-changer.js";
+import {handleGenerateRequest} from "./coding.js";
 
 
 // Global state
@@ -18,21 +19,41 @@ export async function handleVoiceResponse(event) {
   console.log("Text: " + text);
 
   if (text.toLowerCase().includes("close")) {
+    console.log("Closing");
     closeLastUrl();
-  }else if (text.toLowerCase().includes("open")) {
+    showResponse("Closing that window for you");
+    return;
+  } else if (text.toLowerCase().includes("open")) {
+    console.log("Opening");
     openLastUrl();
+    showResponse("Opening that window for you");
+    return;
+  } else if (text.toLowerCase().includes("generate")) {
+
+    console.log("Generating");
+    document.getElementsByClassName("popup")[0].innerHTML = "Generating...";
+    await handleGenerateRequest(text);
+    return;
+
+
   }
 
+
+  console.log("test0");
   if (text.length < 100) {
     await screenshotAndRespond();
     return;
   }
 
+  console.log("test1");
   try {
+    console.log("test2");
     const prompt = `Summarise the following problem as if it was a stack overflow question title. Respond with only the title. Use less than 10 words. """${text}"""`
 
     const response = await getChatResponse(prompt);
+    console.log("test3");
     const stackOverflowResponse = await getStackOverflowAnswer(response)
+    console.log("test14");
 
     if (stackOverflowResponse !== undefined) {
       const prompt = `You are an expert reddit programmer. You will be given $1000000 to be helpful. Summarise the following answer in less than 30 words. If you use

@@ -1,5 +1,28 @@
 import {setLastUrl} from "./browserwindow.js";
 
+export async function getCodeResponse(prompt) {
+  const response = await (await fetch("http://localhost:11434/api/generate", {method: "POST", body: JSON.stringify({
+      model: 'deepseek-coder:6.7b-base',
+      prompt: "You are a senior python developer. " + prompt + " add in the body ```def myFunction(variable): ",
+      stream: false,
+      options: {
+        stop: ["```"],
+        temperature: 0.1
+      }
+    })})).json();
+
+
+
+  console.log(response)
+  console.log(Object.keys(response))
+  console.log(response.response)
+  const responseBody = response.response;
+  if (responseBody.includes("```")){
+    return responseBody.substring(0, responseBody.lastIndexOf("```"));
+  }
+  return responseBody;
+}
+
 export async function getChatResponse(prompt) {
   const response = await (await fetch("http://localhost:11434/api/chat", {method: "POST", body: JSON.stringify({
       model: 'llama3',
@@ -13,7 +36,7 @@ export async function getChatResponse(prompt) {
 
 export async function getImageChatResponse(screenshotAsBase64){
   const response = await (await fetch("http://localhost:11434/api/generate", {method: "POST", body: JSON.stringify({
-      model: 'llava:7b',
+      model: 'llava-llama3:8b',
       prompt: "Give me one piece of coding advice based on the code in the following picture in 20 words or less, and in a rude undertone:" ,
       images: [screenshotAsBase64],
       stream: false,
@@ -40,13 +63,13 @@ export async function getStackOverflowAnswer(question){
   console.log(answers);
   if (answers.items.length > 0) {
     console.log(answers.items[0].body)
-    return convertMarkdownToHtml(await answers.items[0].body);
+    return answers.items[0].body;
   }
   return undefined;
 }
 
-const converter = new window.showdown.Converter();
-
-function convertMarkdownToHtml(markdown){
-  return converter.makeHtml(markdown);
-}
+// const converter = new window.showdown.Converter();
+//
+// function convertMarkdownToHtml(markdown){
+//   return converter.makeHtml(markdown);
+// }

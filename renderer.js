@@ -4,7 +4,7 @@
  * available in this process because `nodeIntegration` is turned off and
  * `contextIsolation` is turned on. Use the contextBridge API in `preload.js`
  * to expose Node.js functionality from the main process.
- */
+//  */
 import {startRecording} from "./voice-recording.js";
 import {debounce} from "./utils.js";
 
@@ -12,8 +12,6 @@ import {debounce} from "./utils.js";
 startRecording();
 
 
-let running = false;
-let expected = 0;
 export function showResponse(response) {
   console.log(response);
   document.getElementsByClassName("popup")[0].innerHTML = response;
